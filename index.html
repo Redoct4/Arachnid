@@ -5,21 +5,58 @@
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v7.0.0/dist/aframe-extras.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <script>
+      // Componente para alternar modelos al hacer click
+      AFRAME.registerComponent('toggle-model', {
+        schema: {
+          model1: {type: 'selector'},
+          model2: {type: 'selector'}
+        },
+        init: function () {
+          this.current = 1; // Empieza con model1 visible
+          this.el.addEventListener('click', () => {
+            if (this.current === 1) {
+              this.data.model1.setAttribute('visible', 'false');
+              this.data.model2.setAttribute('visible', 'true');
+              this.current = 2;
+            } else {
+              this.data.model1.setAttribute('visible', 'true');
+              this.data.model2.setAttribute('visible', 'false');
+              this.current = 1;
+            }
+          });
+        }
+      });
+    </script>
   </head>
   <body>
-    <a-scene mindar-image="imageTargetSrc: ./targetBoth.mind; maxTrack: 2" color-space="sRGB" renderer="colorManagement: true, physicallyCorrectLights" vr-mode-ui="enabled: false" device-orientation-permission-ui="enabled: false">
+    <a-scene mindar-image="imageTargetSrc: ./targetBoth.mind; maxTrack: 2"
+             color-space="sRGB"
+             renderer="colorManagement: true, physicallyCorrectLights"
+             vr-mode-ui="enabled: false"
+             device-orientation-permission-ui="enabled: false">
       <a-assets>
-        <a-asset-item id="spiderModel" src="./Spider1.glb"></a-asset-item>
-        <a-asset-item id="tarantulaModel" src="./Tarantula1.glb"></a-asset-item>
+        <a-asset-item id="spiderModel1" src="./Spider1.glb"></a-asset-item>
+        <a-asset-item id="spiderModel2" src="./Spider2.glb"></a-asset-item>
+        <a-asset-item id="tarantulaModel1" src="./Tarantula1.glb"></a-asset-item>
+        <a-asset-item id="tarantulaModel2" src="./Tarantula2.glb"></a-asset-item>
       </a-assets>
 
       <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
 
+      <!-- Target 1: Spider -->
       <a-entity mindar-image-target="targetIndex: 1">
-        <a-gltf-model rotation="0 0 0 " position="0 -0.25 0" scale="6 6 6" src="#spiderModel" animation-mixer>
+        <a-entity id="spider1" gltf-model="#spiderModel1" rotation="0 0 0" position="0 -0.25 0" scale="6 6 6" animation-mixer visible="true"></a-entity>
+        <a-entity id="spider2" gltf-model="#spiderModel2" rotation="0 0 0" position="0 -0.25 0" scale="6 6 6" animation-mixer visible="false"></a-entity>
+        <!-- El componente toggle-model debe ir solo en uno (el click se hace sobre el grupo) -->
+        <a-entity toggle-model="model1: #spider1; model2: #spider2"></a-entity>
       </a-entity>
+
+      <!-- Target 0: Tarantula -->
       <a-entity mindar-image-target="targetIndex: 0">
-        <a-gltf-model rotation="0 0 0 " position="0 -0.25 0" scale="6 6 6" src="#tarantulaModel" animation-mixer>
+        <a-entity id="tarantula1" gltf-model="#tarantulaModel1" rotation="0 0 0" position="0 -0.25 0" scale="6 6 6" animation-mixer visible="true"></a-entity>
+        <a-entity id="tarantula2" gltf-model="#tarantulaModel2" rotation="0 0 0" position="0 -0.25 0" scale="6 6 6" animation-mixer visible="false"></a-entity>
+        <a-entity toggle-model="model1: #tarantula1; model2: #tarantula2"></a-entity>
       </a-entity>
     </a-scene>
   </body>
