@@ -4,20 +4,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/mind-ar@1.2.5/dist/mindar-image-aframe.prod.js"></script>
+    <style>
+      #scanning-overlay {
+        position: absolute;
+        top: 0; left: 0; right: 0; bottom: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: rgba(0,0,0,0.6);
+        color: #fff;
+        font-size: 2em;
+        font-family: Arial, sans-serif;
+        z-index: 10;
+        transition: opacity 0.3s;
+        pointer-events: none;
+      }
+      #scanning-overlay.hidden {
+        display: none;
+      }
+    </style>
     <script>
       document.addEventListener("DOMContentLoaded", function() {
-        // Spider Target (targetIndex 1)
+        // --- Cambia de modelo con click/tap ---
         let spiderState = 1;
         const spiderModel1 = document.querySelector("#spider1");
         const spiderModel2 = document.querySelector("#spider2");
         const spiderClickable = document.querySelector("#spider-clickable");
-        // Tarantula Target (targetIndex 0)
-        let tarantulaState = 1;
-        const tarantulaModel1 = document.querySelector("#tarantula1");
-        const tarantulaModel2 = document.querySelector("#tarantula2");
-        const tarantulaClickable = document.querySelector("#tarantula-clickable");
-
-        // Alternar modelos Spider
         spiderClickable.addEventListener("click", () => {
           if (spiderState === 1) {
             spiderModel1.setAttribute("visible", "false");
@@ -30,7 +42,10 @@
           }
         });
 
-        // Alternar modelos Tarantula
+        let tarantulaState = 1;
+        const tarantulaModel1 = document.querySelector("#tarantula1");
+        const tarantulaModel2 = document.querySelector("#tarantula2");
+        const tarantulaClickable = document.querySelector("#tarantula-clickable");
         tarantulaClickable.addEventListener("click", () => {
           if (tarantulaState === 1) {
             tarantulaModel1.setAttribute("visible", "false");
@@ -46,11 +61,16 @@
     </script>
   </head>
   <body>
-    <a-scene mindar-image="imageTargetSrc: ./targetBoth.mind; maxTrack: 2"
-             color-space="sRGB"
-             renderer="colorManagement: true, physicallyCorrectLights"
-             vr-mode-ui="enabled: false"
-             device-orientation-permission-ui="enabled: false">
+    <!-- Custom scanning overlay -->
+    <div id="scanning-overlay" class="hidden">
+      Scan the arachnid targets
+    </div>
+    <a-scene
+      mindar-image="imageTargetSrc: ./targetBoth.mind; maxTrack: 2; uiScanning: #scanning-overlay; uiLoading: no; uiError: no"
+      color-space="sRGB"
+      renderer="colorManagement: true, physicallyCorrectLights"
+      vr-mode-ui="enabled: false"
+      device-orientation-permission-ui="enabled: false">
       <a-assets>
         <a-asset-item id="spiderModel1" src="./Spider1.glb"></a-asset-item>
         <a-asset-item id="spiderModel2" src="./Spider2.glb"></a-asset-item>
@@ -58,7 +78,6 @@
         <a-asset-item id="tarantulaModel2" src="./Tarantula2.glb"></a-asset-item>
       </a-assets>
 
-      <!-- Muy importante: cursor y raycaster en la cámara -->
       <a-camera position="0 0 0"
                 look-controls="enabled: false"
                 cursor="fuse: false; rayOrigin: mouse;"
@@ -67,15 +86,16 @@
 
       <!-- Target 1: Spider -->
       <a-entity mindar-image-target="targetIndex: 1">
-        <!-- Modelos 3D, solo uno visible a la vez -->
         <a-entity id="spider1" gltf-model="#spiderModel1" class="clickable"
                   rotation="0 0 0" position="0 -0.25 0" scale="6 6 6"
                   animation-mixer visible="true"></a-entity>
         <a-entity id="spider2" gltf-model="#spiderModel2" class="clickable"
                   rotation="0 0 0" position="0 -0.25 0" scale="6 6 6"
                   animation-mixer visible="false"></a-entity>
-        <!-- Entidad invisible para recibir el click (puedes ponerlo sobre el modelo si lo prefieres)-->
-        <a-entity id="spider-clickable" class="clickable" position="0 0 0" geometry="primitive: box; width: 1; height: 1; depth: 1" material="opacity: 0; transparent: true"></a-entity>
+        <a-entity id="spider-clickable" class="clickable"
+                  position="0 0 0"
+                  geometry="primitive: box; width: 1; height: 1; depth: 1"
+                  material="opacity: 0; transparent: true"></a-entity>
       </a-entity>
 
       <!-- Target 0: Tarantula -->
@@ -86,7 +106,10 @@
         <a-entity id="tarantula2" gltf-model="#tarantulaModel2" class="clickable"
                   rotation="0 0 0" position="0 -0.25 0" scale="6 6 6"
                   animation-mixer visible="false"></a-entity>
-        <a-entity id="tarantula-clickable" class="clickable" position="0 0 0" geometry="primitive: box; width: 1; height: 1; depth: 1" material="opacity: 0; transparent: true"></a-entity>
+        <a-entity id="tarantula-clickable" class="clickable"
+                  position="0 0 0"
+                  geometry="primitive: box; width: 1; height: 1; depth: 1"
+                  material="opacity: 0; transparent: true"></a-entity>
       </a-entity>
     </a-scene>
   </body>
